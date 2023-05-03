@@ -142,7 +142,7 @@ class AccordionForm {
 	 */
 	viewService(){
 		var service = document.getElementById('service');
-		service.innerHTML = this.$programDetail.programName+" "+this.$programCategory.programCategoryName;
+		service.innerHTML = this.$programDetail.programName;
 	}
 	/**
 	 * Check form's id in completedForm list (from MongoDB) and use to determine if form is editable
