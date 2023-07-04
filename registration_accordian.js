@@ -63,13 +63,17 @@ class AccordionForm {
 			   var accordionContentDiv = document.createElement("div");
 			   accordionContentDiv.className="accordion-content";
 			   var ul= creEl('ul');
+			   //sorting forms based on sequence
+			   form.forms.sort(function(r,a){return r.sequence-a.sequence});
 			   // for every form in the formCategory
 			   form.forms.forEach((cForm) => {
 				   //check it's editable
 				   let editable = $this.checkform(cForm.formId);
 				   let is_live = cForm.is_live;
 				   var li=creEl('li');
-				   var li_text=creEl('span', 'accordion_name');
+				   //var li_text=creEl('span', 'accordion_name');
+				   // Added cross line for completed forms
+				   var li_text=creEl('span', 'accordion_name'+((editable)? ' completed_form': ''));
 				   var imgCheck = creEl("img");
 			       imgCheck.src = $this.getCheckedIcon(editable);
 				   li_text.innerHTML = cForm.name;
@@ -80,7 +84,7 @@ class AccordionForm {
 				   if(is_live){
 				   if(editable){
 					   let dbData = $this.getformData(cForm.formId)
-						if(this.$isLiveProgram){
+						if(this.$isLiveProgram  && cForm.is_editable){
 							formLink.href = (cForm.formId) ? "https://www.jotform.com/edit/"+dbData.submissionId+"?memberId="+$this.webflowMemberId+"&studentEmail="+$this.$studentDetail.studentEmail+"&accountEmail="+$this.accountEmail+"&paymentId="+$this.$studentDetail.uniqueIdentification : "";
 						}else{
 						   formLink.href = "https://www.jotform.com/submission/"+dbData.submissionId;
@@ -93,12 +97,24 @@ class AccordionForm {
 				   formLink.className = (is_live && window.innerWidth > 1200) ? "iframe-lightbox-link" : "";
 				   var span=creEl('span', 'action_text');
 				    if(is_live){
-						span.innerHTML = (editable) ? ((this.$isLiveProgram) ? "Edit form" : "View Form" ): "Go to form";
+						span.innerHTML = (editable) ? ((this.$isLiveProgram && cForm.is_editable) ? "Edit form" : "View Form" ): "Go to form";
 					}else{
 						span.innerHTML = "Coming Soon";
 					}
 				   formLink.append(span)
 				   li.append(formLink);
+				   
+				   /* Resubmission allow based db condition form code*/
+				   if(cForm.is_resubmission && (editable && this.$isLiveProgram && cForm.is_editable)){
+					var resubmissionFormLink=creEl('a');
+					resubmissionFormLink.href = (cForm.formId) ? "https://form.jotform.com/"+cForm.formId+"?memberId="+$this.webflowMemberId+"&studentEmail="+$this.$studentDetail.studentEmail+"&accountEmail="+$this.accountEmail+"&paymentId="+$this.$studentDetail.uniqueIdentification : "";
+					resubmissionFormLink.className = (is_live && window.innerWidth > 1200) ? "iframe-lightbox-link" : "";
+					var span2=creEl('span', 'resubmit_text');
+					span2.innerHTML = "Resubmit";
+					resubmissionFormLink.append(span2)
+					li.append(resubmissionFormLink);
+				    }
+				   
 				   ul.appendChild(li);
 				   if(is_live){
 				    $this.$totalForm++;
@@ -114,7 +130,13 @@ class AccordionForm {
 	var script = document.createElement("script");
 	script.setAttribute("src", "https://cdn.logwork.com/widget/countdown.js");
 	document.body.appendChild(script);
+	// added class for completed form	
+	let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
+	if(percentageAmount == '100'){
+		accordionDiv.classList.add("all_completed_form")
 	}
+	}
+	
 	/**
 	 * Render single json form data
 	 * @param responseText - single form object provided by API
@@ -142,7 +164,7 @@ class AccordionForm {
 	 */
 	viewService(){
 		var service = document.getElementById('service');
-		service.innerHTML = this.$programDetail.programName;
+		service.innerHTML = this.$programDetail.programName+" "+this.$programCategory.programCategoryName;
 	}
 	/**
 	 * Check form's id in completedForm list (from MongoDB) and use to determine if form is editable
@@ -171,7 +193,10 @@ class AccordionForm {
 	 */
 	checkAllForms(forms){
 		if(forms){
-			var formsId = forms.map((formItem) => formItem.formId.toString());
+			// showing status only for live forms
+			var form = forms.filter((item => item.is_live));
+			var formsId = form.map((formItem) => formItem.formId.toString());
+			//var formsId = forms.map((formItem) => formItem.formId.toString());
 			var completedFormsId = this.$completedForm.map((formItem) => formItem.formId.toString());
 			const compareForm = completedFormsId.filter((obj) => formsId.indexOf(obj) !== -1);
 			const uniqueform = compareForm.filter((value, index, self) => self.indexOf(value) === index)
@@ -219,9 +244,12 @@ class AccordionForm {
 		
 		// Get and format deadline date
 		var date = this.$programDetail.deadlineDate.replace(/\\/g, '');
-		date = date.replace(/"/g, '')
+		date = date.replace(/"/g, '');
 		var deadlineDate = new Date(date);
-		date = date.substring(0,16); //remove the final ':00' for countdown timer
+
+		var timerDate = this.$programDetail.startDate.replace(/\\/g, '');
+		timerDate = timerDate.replace(/"/g, '');
+		timerDate = timerDate.substring(0,16); //remove the final ':00' for countdown timer
 		
 		// Get and format program dates
 		let startDate = new Date(this.$programDetail.startDate);
@@ -233,6 +261,10 @@ class AccordionForm {
 		// create and set progress bar & percentage
 		let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
 		let accordionFooter = document.getElementById("accordion-footer-"+this.currentIndex);
+		// added class for completed form
+		if(percentageAmount == '100'){
+			accordionFooter.classList.add("all_completed_form")
+		}
 		accordionFooter.innerHTML ="";
 		let progressbar = document.createElement("div");
 		progressbar.className = "form-progressbar";
@@ -258,13 +290,21 @@ class AccordionForm {
 		}		
 		
 		// Countdown timer
+		let timer_div = document.createElement("div");
+		timer_div.style.width = '50%';
+		timer_div.style.display = 'flex';
+		timer_div.style.marginLeft = 'auto';
+		timer_div.style.marginRight = 'auto';
+		
 		let timer_clock = document.createElement("a");
 		timer_clock.href = "https://logwork.com/countdown-xknf";
 		timer_clock.className = "countdown-timer"; 
-		timer_clock.setAttribute("data-style", "columns"); timer_clock.setAttribute("data-timezone", "America/Los_Angeles"); timer_clock.setAttribute("data-date", date); timer_clock.setAttribute("data-digitscolor", "#a51c30");
+		timer_clock.setAttribute("data-style", "columns"); timer_clock.setAttribute("data-timezone", "America/Los_Angeles"); timer_clock.setAttribute("data-date", timerDate); timer_clock.setAttribute("data-digitscolor", "#a51c30");
 		timer_clock.innerHTML = program_dates_text;
+		
 		let parent = accordionFooter.parentNode;
-		// parent.insertBefore(timer_clock, accordionFooter);
+		timer_div.appendChild(timer_clock);
+		parent.insertBefore(timer_div, accordionFooter);		
 		
 		// add elements to DOM
 		deadlineText.append(footerText);
@@ -334,4 +374,5 @@ class AccordionForm {
 		  });
 		});
 	}
+
 }
