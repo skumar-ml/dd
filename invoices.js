@@ -121,7 +121,7 @@ class DDInvoices {
 
             const currentProgramTabSubtitleDiv = document.createElement('div');
             currentProgramTabSubtitleDiv.className = 'dm-sans-3 opacity-70';
-            currentProgramTabSubtitleDiv.textContent = `${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last} | ${ this.$startDate.toLocaleString('default', { month: 'long' })} ${this.$startDate.getDate()} - ${ this.$endDate.toLocaleString('default', { month: 'long' })} ${this.$endDate.getDate()}`;
+            currentProgramTabSubtitleDiv.textContent = `${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last} | ${this.$startDate.getFullYear()}`;
 
             currentProgramContentDiv.appendChild(currentProgramSubtitleDiv);
             currentProgramContentDiv.appendChild(currentProgramTabSubtitleDiv);
@@ -319,7 +319,7 @@ class DDInvoices {
         }
         var xhr = new XMLHttpRequest()
         var $this = this;
-        xhr.open("POST", "https://fsiokpe5d7.execute-api.us-west-1.amazonaws.com/prod/camp/createCheckoutUrlForInvoice", true)
+        xhr.open("POST", this.baseUrl+"createCheckoutUrlForInvoice", true)
         xhr.withCredentials = false
         xhr.send(JSON.stringify(data))
         xhr.onload = function () {
