@@ -1,4 +1,3 @@
-
 class DDInvoices {
     $invoiceList = [];
     $programDetail = {};
@@ -241,13 +240,13 @@ class DDInvoices {
                         invoicePaymentLinkDiv.appendChild(paymentLink);
                     });
 
-                    if(paymentProcessMsg){
-						invoicePaymentLinkDiv.prepend(info_text)
-						info_text.setAttribute('tip', invoice.paymentProcessMsg)
-							
-						info_text.setAttribute('tip-top','')
-						info_text.setAttribute('tip-left','')
-					}
+                    if (paymentProcessMsg) {
+                        invoicePaymentLinkDiv.prepend(info_text)
+                        info_text.setAttribute('tip', invoice.paymentProcessMsg)
+
+                        info_text.setAttribute('tip-top', '')
+                        info_text.setAttribute('tip-left', '')
+                    }
                 } else {
                     const paymentLink = document.createElement('a');
 
@@ -263,7 +262,7 @@ class DDInvoices {
                     paymentLink.appendChild(paymentOptionDiv);
                     invoicePaymentLinkDiv.appendChild(paymentLink);
 
-                    $this.$completedInvoice;
+                    $this.$completedInvoice++;
                 }
 
                 $this.$totalInvoice++;
@@ -282,7 +281,8 @@ class DDInvoices {
 
             const preCampProgressSubtitleDiv = document.createElement('div');
             preCampProgressSubtitleDiv.className = 'pre-camp_subtitle opacity-50';
-            let percentageAmount = (this.$completetdInvoice) ? (100 * this.$completetdInvoice) / this.$totalInvoice : 0;
+            let percentageAmount = (this.$completedInvoice) ? (100 * this.$completedInvoice) / this.$totalInvoice : 0;
+            console.log('percentageAmount', this.$completedInvoice, this.$totalInvoice)
             preCampProgressSubtitleDiv.textContent = `${Math.round(percentageAmount)}% / ${this.$completedInvoice} of ${this.$totalInvoice} forms complete`;
 
             const preCampProgressBar = document.createElement('div');
@@ -290,6 +290,7 @@ class DDInvoices {
 
             const subDiv = document.createElement('div');
             subDiv.className = 'sub-div';
+            subDiv.style.width = percentageAmount + "%";
             preCampProgressBar.appendChild(subDiv);
             preCampProgressContainer.appendChild(preCampProgressSubtitleDiv);
             preCampProgressContainer.appendChild(preCampProgressBar);
@@ -315,11 +316,11 @@ class DDInvoices {
             "paymentLinkId": paymentLinkId,
             "memberId": this.webflowMemberId,
             "successUrl": encodeURI("https://www.debatedrills.com/payment-confirmation?programName=" + title),
-            "cancelUrl": "https://www.debatedrills.com/invoices",
+            "cancelUrl": "https://www.debatedrills.com/portal/invoices",
         }
         var xhr = new XMLHttpRequest()
         var $this = this;
-        xhr.open("POST", this.baseUrl+"createCheckoutUrlForInvoice", true)
+        xhr.open("POST", this.baseUrl + "createCheckoutUrlForInvoice", true)
         xhr.withCredentials = false
         xhr.send(JSON.stringify(data))
         xhr.onload = function () {
@@ -350,42 +351,42 @@ class DDInvoices {
     /**
      * Tooltip code for display info message
      */
-    initializeToolTips(){
-		const elements = [...document.querySelectorAll('[tip]')]
-		var i = 0;
-		for (const el of elements) {
-			console.log('el', el)
-		  const tip = document.createElement('div')
-		  tip.innerHTML = '';
-		  tip.classList.add('tooltip')
-		  tip.textContent = el.getAttribute('tip')
-		  const x = el.hasAttribute('tip-left') ? 'calc(-100% - 5px)' : '16px'
-		  const y = el.hasAttribute('tip-top') ? '-100%' : '0'
-		  tip.style.transform = `translate(${x}, ${y})`
-		  el.appendChild(tip)
-		  el.onpointermove = e => {
-			if (e.target !== e.currentTarget) return
+    initializeToolTips() {
+        const elements = [...document.querySelectorAll('[tip]')]
+        var i = 0;
+        for (const el of elements) {
+            console.log('el', el)
+            const tip = document.createElement('div')
+            tip.innerHTML = '';
+            tip.classList.add('tooltip')
+            tip.textContent = el.getAttribute('tip')
+            const x = el.hasAttribute('tip-left') ? 'calc(-100% - 5px)' : '16px'
+            const y = el.hasAttribute('tip-top') ? '-100%' : '0'
+            tip.style.transform = `translate(${x}, ${y})`
+            el.appendChild(tip)
+            el.onpointermove = e => {
+                if (e.target !== e.currentTarget) return
 
-			const rect = tip.getBoundingClientRect()
-			const rectWidth = rect.width + 16
-			const vWidth = window.innerWidth - rectWidth
-			const rectX = el.hasAttribute('tip-left') ? e.clientX - rectWidth : e.clientX + rectWidth
-			const minX = el.hasAttribute('tip-left') ? 0 : rectX
-			const maxX = el.hasAttribute('tip-left') ? vWidth : window.innerWidth
-			const x = rectX < minX ? rectWidth : rectX > maxX ? vWidth : e.clientX
-			tip.style.left = `${x}px`
-			tip.style.top = `${e.clientY}px`
-		  }
-		}
-	}
-    creEl(name,className,idName){
+                const rect = tip.getBoundingClientRect()
+                const rectWidth = rect.width + 16
+                const vWidth = window.innerWidth - rectWidth
+                const rectX = el.hasAttribute('tip-left') ? e.clientX - rectWidth : e.clientX + rectWidth
+                const minX = el.hasAttribute('tip-left') ? 0 : rectX
+                const maxX = el.hasAttribute('tip-left') ? vWidth : window.innerWidth
+                const x = rectX < minX ? rectWidth : rectX > maxX ? vWidth : e.clientX
+                tip.style.left = `${x}px`
+                tip.style.top = `${e.clientY}px`
+            }
+        }
+    }
+    creEl(name, className, idName) {
         var el = document.createElement(name);
-          if(className){
+        if (className) {
             el.className = className;
-          }
-          if(idName){
+        }
+        if (idName) {
             el.setAttribute("id", idName)
-          }
-          return el;
-      }
+        }
+        return el;
+    }
 }
