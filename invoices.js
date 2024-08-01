@@ -175,104 +175,109 @@ class DDInvoices {
 
             const preCampGrid = document.createElement('div');
             preCampGrid.className = 'pre-camp_grid';
-
-            tab.invoiceList.forEach((invoice) => {
-                const preCampRow = document.createElement('div');
-                preCampRow.className = 'pre-camp_row';
-
-                let editable = (invoice.is_completed) ? true : false;
-
-                let completed = (editable && (invoice.status == 'Complete' || !invoice.status));
-                let failed = (invoice.status == 'Failed');
-                let processing = (invoice.status == 'Processing');
-                let paymentProcessMsg = (invoice.paymentProcessMsg != '');
-                let info_text = this.creEl('span', 'info_text')
-                info_text.innerHTML = 'i';
-
-                const invoiceImg = document.createElement('img');
-                invoiceImg.loading = 'lazy';
-                invoiceImg.alt = '';
-                invoiceImg.className = 'status_icon';
-                invoiceImg.src = this.getCheckedIcon(completed, failed, processing);
-
-                const invoiceNameDiv = document.createElement('div');
-                invoiceNameDiv.className = 'dm-sans-3 bold-500';
-                invoiceNameDiv.textContent = invoice.invoiceName;
-
-                if (failed) {
-                    invoiceNameDiv.append(info_text)
-                    info_text.setAttribute('tip', 'Last transaction failed, Pay again!')
-
-                    info_text.setAttribute('tip-top', '')
-                    info_text.setAttribute('tip-left', '')
-                }
-
-                const invoicePaymentLinkDiv = document.createElement('div');
-                invoicePaymentLinkDiv.className = 'invoice_payment_link';
-
-                var jotFormUrlLink = invoice.jotFormUrlLink;
-                jotFormUrlLink.sort((a, b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
-                if (!editable || failed) {
-                    jotFormUrlLink.forEach((option) => {
-                        const paymentLink = document.createElement('a');
-
-                        const paymentOptionDiv = document.createElement('div');
-                        paymentOptionDiv.className = 'dm-sans-3 opacity-70 margin-right';
-                        paymentOptionDiv.textContent = option.title;
-
-                        if (option.paymentType == 'jotform') {
-                            // Commented JotForm code after discussion with The Shubham
-                            // paymentLink.href = (link.formid) ? "https://form.jotform.com/" + link.formid + "?memberId=" + $this.webflowMemberId + "&invoiceId=" + invoice.invoice_id + "&paymentLinkId=" + link.paymentLinkId + "&paymentId=" + $this.$studentDetail.uniqueIdentification : "";
-                            // paymentLink.className = (window.innerWidth > 1200) ? "iframe-lightbox-link" : "";
-                        } else {
-
-                            paymentLink.addEventListener('click', function () {
-                                paymentOptionDiv.innerHTML = "Processing..."
-                                //console.log('tab.studentDetail', tab.studentDetail)
-                                $this.initializeStripePayment(invoice.invoice_id, invoice.invoiceName, option.amount, option.paymentLinkId, paymentOptionDiv, option.title, option.paymentType, tab.studentDetail)
-                            })
-                        }
-
-                        paymentLink.className = 'dashboard_link-block w-inline-block incomplete_invoice';
-
-
-
-                        paymentLink.appendChild(paymentOptionDiv);
-                        invoicePaymentLinkDiv.appendChild(paymentLink);
-                    });
-
-                    if (paymentProcessMsg) {
-                        invoicePaymentLinkDiv.prepend(info_text)
-                        info_text.setAttribute('tip', invoice.paymentProcessMsg)
-
+            if (tab.invoiceList.length > 0) {
+                tab.invoiceList.forEach((invoice) => {
+                    const preCampRow = document.createElement('div');
+                    preCampRow.className = 'pre-camp_row';
+    
+                    let editable = (invoice.is_completed) ? true : false;
+    
+                    let completed = (editable && (invoice.status == 'Complete' || !invoice.status));
+                    let failed = (invoice.status == 'Failed');
+                    let processing = (invoice.status == 'Processing');
+                    let paymentProcessMsg = (invoice.paymentProcessMsg != '');
+                    let info_text = this.creEl('span', 'info_text')
+                    info_text.innerHTML = 'i';
+    
+                    const invoiceImg = document.createElement('img');
+                    invoiceImg.loading = 'lazy';
+                    invoiceImg.alt = '';
+                    invoiceImg.className = 'status_icon';
+                    invoiceImg.src = this.getCheckedIcon(completed, failed, processing);
+    
+                    const invoiceNameDiv = document.createElement('div');
+                    invoiceNameDiv.className = 'dm-sans-3 bold-500';
+                    invoiceNameDiv.textContent = invoice.invoiceName;
+    
+                    if (failed) {
+                        invoiceNameDiv.append(info_text)
+                        info_text.setAttribute('tip', 'Last transaction failed, Pay again!')
+    
                         info_text.setAttribute('tip-top', '')
                         info_text.setAttribute('tip-left', '')
                     }
-                } else {
-                    const paymentLink = document.createElement('a');
-
-
-                    const paymentOptionDiv = document.createElement('div');
-                    paymentOptionDiv.className = 'dm-sans-3 opacity-70 margin-right';
-                    if (processing) {
-                        paymentOptionDiv.textContent = 'Processing...';
+    
+                    const invoicePaymentLinkDiv = document.createElement('div');
+                    invoicePaymentLinkDiv.className = 'invoice_payment_link';
+    
+                    var jotFormUrlLink = invoice.jotFormUrlLink;
+                    jotFormUrlLink.sort((a, b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
+                    if (!editable || failed) {
+                        jotFormUrlLink.forEach((option) => {
+                            const paymentLink = document.createElement('a');
+    
+                            const paymentOptionDiv = document.createElement('div');
+                            paymentOptionDiv.className = 'dm-sans-3 opacity-70 margin-right';
+                            paymentOptionDiv.textContent = option.title;
+    
+                            if (option.paymentType == 'jotform') {
+                                // Commented JotForm code after discussion with The Shubham
+                                // paymentLink.href = (link.formid) ? "https://form.jotform.com/" + link.formid + "?memberId=" + $this.webflowMemberId + "&invoiceId=" + invoice.invoice_id + "&paymentLinkId=" + link.paymentLinkId + "&paymentId=" + $this.$studentDetail.uniqueIdentification : "";
+                                // paymentLink.className = (window.innerWidth > 1200) ? "iframe-lightbox-link" : "";
+                            } else {
+    
+                                paymentLink.addEventListener('click', function () {
+                                    paymentOptionDiv.innerHTML = "Processing..."
+                                    //console.log('tab.studentDetail', tab.studentDetail)
+                                    $this.initializeStripePayment(invoice.invoice_id, invoice.invoiceName, option.amount, option.paymentLinkId, paymentOptionDiv, option.title, option.paymentType, tab.studentDetail)
+                                })
+                            }
+    
+                            paymentLink.className = 'dashboard_link-block w-inline-block incomplete_invoice';
+    
+    
+    
+                            paymentLink.appendChild(paymentOptionDiv);
+                            invoicePaymentLinkDiv.appendChild(paymentLink);
+                        });
+    
+                        if (paymentProcessMsg) {
+                            invoicePaymentLinkDiv.prepend(info_text)
+                            info_text.setAttribute('tip', invoice.paymentProcessMsg)
+    
+                            info_text.setAttribute('tip-top', '')
+                            info_text.setAttribute('tip-left', '')
+                        }
                     } else {
-                        paymentOptionDiv.textContent = 'Completed';
+                        const paymentLink = document.createElement('a');
+    
+    
+                        const paymentOptionDiv = document.createElement('div');
+                        paymentOptionDiv.className = 'dm-sans-3 opacity-70 margin-right';
+                        if (processing) {
+                            paymentOptionDiv.textContent = 'Processing...';
+                        } else {
+                            paymentOptionDiv.textContent = 'Completed';
+                        }
+                        paymentLink.className = 'dashboard_link-block w-inline-block ' + (completed) ? 'completed_form_link' : '';
+                        paymentLink.appendChild(paymentOptionDiv);
+                        invoicePaymentLinkDiv.appendChild(paymentLink);
+    
+                        $this.$completedInvoice++;
                     }
-                    paymentLink.className = 'dashboard_link-block w-inline-block ' + (completed) ? 'completed_form_link' : '';
-                    paymentLink.appendChild(paymentOptionDiv);
-                    invoicePaymentLinkDiv.appendChild(paymentLink);
-
-                    $this.$completedInvoice++;
-                }
-
-                $this.$totalInvoice++;
-                preCampRow.appendChild(invoiceImg);
-                preCampRow.appendChild(invoiceNameDiv);
-                preCampRow.appendChild(invoicePaymentLinkDiv);
+    
+                    $this.$totalInvoice++;
+                    preCampRow.appendChild(invoiceImg);
+                    preCampRow.appendChild(invoiceNameDiv);
+                    preCampRow.appendChild(invoicePaymentLinkDiv);
+                    preCampGrid.appendChild(preCampRow);
+                });
+            }else{
+                const preCampRow = document.createElement('div');
+                preCampRow.className = 'pre-camp_row';
+                preCampRow.innerHTML = "No record found"
                 preCampGrid.appendChild(preCampRow);
-            });
-
+            }
 
             const preCampSubtitleWrapper = document.createElement('div');
             preCampSubtitleWrapper.className = 'pre-camp_subtitle-wrapper';
