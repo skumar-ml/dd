@@ -101,6 +101,7 @@ class DDInvoices {
         tabData.forEach((tab, index) => {
             //only use for static data in looping 
             this.updateGlobalVariable(tab);
+            this.$totalInvoice = 0;
             const tabLink = document.createElement('a');
             tabLink.className = 'current-programs_sub-div w-inline-block w-tab-link';
             if (index === 0) tabLink.classList.add('w--current');
