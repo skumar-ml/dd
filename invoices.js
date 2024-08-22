@@ -180,7 +180,7 @@ class DDInvoices {
                     const preCampRow = document.createElement('div');
                     preCampRow.className = 'pre-camp_row';
     
-                    let editable = (invoice.is_completed) ? true : false;
+                    let editable = (invoice.is_completed || invoice.status == 'Processing') ? true : false;
     
                     let completed = (editable && (invoice.status == 'Complete' || !invoice.status));
                     let failed = (invoice.status == 'Failed');
