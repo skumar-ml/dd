@@ -120,7 +120,7 @@ class DDInvoices {
 
             const currentProgramTabSubtitleDiv = document.createElement('div');
             currentProgramTabSubtitleDiv.className = 'dm-sans-3 opacity-70';
-            currentProgramTabSubtitleDiv.textContent = `${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last} | ${this.$startDate.getFullYear()}`;
+            currentProgramTabSubtitleDiv.textContent = `${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last} |  ${tab.studentDetail.yearId.toString().substr(0, 4)+'-'+tab.studentDetail.yearId.toString().substr(4, 7)}`;
 
             currentProgramContentDiv.appendChild(currentProgramSubtitleDiv);
             currentProgramContentDiv.appendChild(currentProgramTabSubtitleDiv);
