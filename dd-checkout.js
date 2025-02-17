@@ -181,6 +181,7 @@ class CheckOutWebflow {
 				var isValidName = $this.checkUniqueStudentEmail();
 				if (isValidName) {
 					checkoutFormError.style.display = "none";
+					$this.activeBreadCrumb('pay-deposite')
 					$this.activateDiv("checkout_payment");
 					//  while ($this.$checkOutResponse == false) {
 					//  	console.log('Got API response')
@@ -205,6 +206,7 @@ class CheckOutWebflow {
 			// click on back button reinitialze payment tab
 			document.getElementsByClassName("bank-transfer-tab")[0].click();
 			//document.getElementById('w-tabs-1-data-w-tab-0').click()
+			$this.activeBreadCrumb('stud-details')
 			setTimeout(function () {
 				$(".w-tab-link").removeClass("w--current");
 				$(".w-tab-pane").removeClass("w--tab-active");
@@ -353,5 +355,12 @@ class CheckOutWebflow {
 		} catch (error) {
 			console.error("Error rendering random number:", error);
 		}
+	}
+
+	activeBreadCrumb(activeId) {
+		let breadCrumbList = document.querySelectorAll('.container_pb ul li');
+		breadCrumbList.forEach(element => element.classList.remove('active'))
+		document.getElementById(activeId).classList.add('active')
+
 	}
 }
