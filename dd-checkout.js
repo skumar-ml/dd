@@ -181,7 +181,7 @@ class CheckOutWebflow {
 				var isValidName = $this.checkUniqueStudentEmail();
 				if (isValidName) {
 					checkoutFormError.style.display = "none";
-					$this.activeBreadCrumb('pay-deposite')
+					$this.activeBreadCrumb('pay-deposit')
 					$this.activateDiv("checkout_payment");
 					//  while ($this.$checkOutResponse == false) {
 					//  	console.log('Got API response')
